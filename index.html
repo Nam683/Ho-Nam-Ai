@@ -1,1 +1,186 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ho Nam AI - Professional</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-dark: #212121; --sidebar-dark: #171717; --text-main: #ececec; --gpt-green: #10a37f; --user-msg-bg: #2f2f2f; --ai-msg-bg: transparent; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; transition: all 0.2s ease; }
+        body { background: var(--bg-dark); color: var(--text-main); margin: 0; display: flex; height: 100vh; overflow: hidden; }
 
+        /* SIDEBAR CHUẨN GPT */
+        .sidebar { width: 260px; background: var(--sidebar-dark); display: flex; flex-direction: column; padding: 10px; border-right: 1px solid rgba(255,255,255,0.1); }
+        .new-chat { border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; padding: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 14px; margin-bottom: 20px; }
+        .new-chat:hover { background: rgba(255,255,255,0.1); }
+        .history-section { flex: 1; overflow-y: auto; font-size: 13px; color: #b4b4b4; }
+        
+        /* VÍ TIỀN HIỆN ĐẠI */
+        .wallet-card { background: #2f2f2f; border-radius: 12px; padding: 15px; margin-top: auto; border: 1px solid rgba(255,255,255,0.1); }
+        .wallet-card small { font-size: 10px; color: #8e8e8e; text-transform: uppercase; letter-spacing: 1px; }
+        .balance { font-size: 20px; font-weight: 600; color: gold; margin: 5px 0; }
+        .btn-game { width: 100%; background: var(--gpt-green); border: none; color: white; padding: 8px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 12px; }
+
+        /* KHUNG CHAT CHÍNH */
+        .main-container { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .header-bar { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .model-name { font-weight: 600; font-size: 18px; color: #fff; }
+        
+        #chat-window { flex: 1; overflow-y: auto; padding-bottom: 150px; }
+        .msg-wrapper { width: 100%; display: flex; justify-content: center; padding: 25px 0; }
+        .msg-content { max-width: 750px; width: 90%; display: flex; gap: 20px; line-height: 1.6; font-size: 15.5px; }
+        .avatar { width: 30px; height: 30px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .user-avatar { background: #5436da; }
+        .ai-avatar { background: var(--gpt-green); }
+        .text { white-space: pre-wrap; word-break: break-word; }
+
+        /* Ô NHẬP LIỆU CHUẨN GPT */
+        .input-container { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px 0 40px 0; background: linear-gradient(transparent, var(--bg-dark) 20%); display: flex; justify-content: center; }
+        .input-wrapper { max-width: 750px; width: 90%; background: #2f2f2f; border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 10px 15px; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        #user-input { flex: 1; background: transparent; border: none; color: #fff; outline: none; padding: 10px 5px; font-size: 16px; }
+        .action-btn { background: none; border: none; color: #8e8e8e; cursor: pointer; font-size: 20px; padding: 5px; }
+        .action-btn:hover { color: #fff; }
+        .send-btn-active { color: var(--gpt-green) !important; }
+
+        /* ẨN NÚT NGHE TUYỆT ĐỐI */
+        audio, video, .voice-btn, .nghe-btn, [alt*="Nghe"] { display: none !important; }
+        img { max-width: 100%; border-radius: 8px; margin: 10px 0; border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="new-chat" onclick="location.reload()">
+        <i class="fa-solid fa-plus"></i> New Chat
+    </div>
+    <div class="history-section" id="chat-hist">
+        <p style="padding:10px">Yesterday</p>
+        <div style="padding:10px; color: #ececec">Chào chủ nhân Ho Nam...</div>
+    </div>
+    
+    <div class="wallet-card">
+        <small>Account Balance</small>
+        <div class="balance">$<span id="bal-val">1,000,000</span></div>
+        <button class="btn-game" onclick="bet()">PLAY TÀI XỈU</button>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="header-bar">
+        <div class="model-name">Ho Nam AI <small style="color:var(--gpt-green); font-size:12px">4.0</small></div>
+        <i class="fa-solid fa-arrow-right-from-bracket" style="cursor:pointer; opacity:0.5" onclick="alert('Đã đăng xuất!')"></i>
+    </div>
+
+    <div id="chat-window">
+        <div class="msg-wrapper" style="background: var(--ai-msg-bg)">
+            <div class="msg-content">
+                <div class="avatar ai-avatar"><i class="fa-solid fa-robot" style="font-size:14px; color:#fff"></i></div>
+                <div class="text">Xin chào chủ nhân <b>Ho Nam</b>! Tôi là <b>Ho Nam AI</b>. Hôm nay tôi có thể giúp gì cho bạn?</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-container">
+        <div class="input-wrapper">
+            <label for="img-up" class="action-btn"><i class="fa-solid fa-paperclip"></i></label>
+            <input type="file" id="img-up" hidden accept="image/*" onchange="handleFile(this)">
+            <input type="text" id="user-input" placeholder="Message Ho Nam AI..." onkeypress="if(event.key==='Enter') startChat()">
+            <button class="action-btn" id="send-trigger" onclick="startChat()"><i class="fa-solid fa-circle-arrow-up"></i></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // CHÈN KEY CỦA BẠN VÀO ĐÂY
+    const API_KEY = "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";
+
+    let balance = parseInt(localStorage.getItem('hn_money')) || 1000000;
+    let base64Img = null;
+
+    window.onload = () => { document.getElementById('bal-val').innerText = balance.toLocaleString(); };
+
+    async function startChat() {
+        const input = document.getElementById('user-input');
+        const prompt = input.value.trim();
+        if(!prompt && !base64Img) return;
+
+        // LỆNH GIÀU CÓ
+        if(prompt.toLowerCase() === "boostmoney") {
+            balance = 100000000; saveBal();
+            addMsg('ai', "💰 <b>HỆ THỐNG:</b> Đã kích hoạt gói Đại Gia. Số dư hiện tại: $100,000,000!");
+            input.value = ''; return;
+        }
+
+        addMsg('user', base64Img ? `<img src="${base64Img}"><br>${prompt}` : prompt);
+        input.value = '';
+        document.getElementById('send-trigger').classList.remove('send-btn-active');
+
+        try {
+            const isVision = base64Img !== null;
+            const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: isVision ? "llama-3.2-11b-vision-preview" : "llama-3.3-70b-versatile",
+                    messages: [{ role: "user", content: isVision ? [{type:"text", text: prompt || "Phân tích ảnh"}, {type:"image_url", image_url:{url:base64Img}}] : prompt }]
+                })
+            });
+            const data = await res.json();
+            base64Img = null;
+            addMsg('ai', data.choices[0].message.content);
+        } catch (e) {
+            addMsg('ai', "⚠️ Lỗi kết nối. Chủ nhân vui lòng kiểm tra lại mã API!");
+        }
+    }
+
+    function addMsg(role, content) {
+        const win = document.getElementById('chat-window');
+        const div = document.createElement('div');
+        div.className = 'msg-wrapper';
+        if(role === 'user') div.style.background = 'transparent';
+        
+        div.innerHTML = `
+            <div class="msg-content">
+                <div class="avatar ${role}-avatar">${role==='user'?'H':'<i class="fa-solid fa-robot" style="font-size:14px; color:#fff"></i>'}</div>
+                <div class="text">${content.replace(/\n/g, '<br>')}</div>
+            </div>
+        `;
+        win.appendChild(div);
+        win.scrollTop = win.scrollHeight;
+    }
+
+    function handleFile(input) {
+        if (input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = e => { 
+                base64Img = e.target.result; 
+                addMsg('ai', "<i>Đã nhận tệp đính kèm. Tôi đã sẵn sàng phân tích!</i>");
+                document.getElementById('send-trigger').classList.add('send-btn-active');
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function bet() {
+        const win = Math.random() > 0.5;
+        balance += win ? 200000 : -100000;
+        saveBal();
+        alert(win ? "THẮNG LỚN! +$200,000" : "HƠI TIẾC! -$100,000");
+    }
+
+    function saveBal() {
+        localStorage.setItem('hn_money', balance);
+        document.getElementById('bal-val').innerText = balance.toLocaleString();
+    }
+
+    // Hiệu ứng đổi màu nút gửi khi có chữ
+    document.getElementById('user-input').oninput = function() {
+        const btn = document.getElementById('send-trigger');
+        if(this.value.trim().length > 0) btn.classList.add('send-btn-active');
+        else btn.classList.remove('send-btn-active');
+    };
+</script>
+</body>
+</html>
